@@ -1,0 +1,49 @@
+import numpy as np
+from skimage import io
+
+#a
+images = np.zeros((9,400,600))
+
+for i in range (9):
+  image = np.load(f"car_{i}.npy")
+  images [i] = image
+
+#print(images)
+
+#b
+#print(np.sum(images))
+
+#c
+print(np.sum(images, axis=(1,2))) 
+
+#d
+suma = np.sum(images, axis=(1,2))
+
+maxim = 0
+contor = -1
+
+for i in range (9):
+  if suma[i] > maxim:
+    maxim = suma[i]
+    contor =i
+
+print(contor)
+
+print(np.argmax(suma)) 
+
+#e
+mean_image = np.mean(images, axis=0)
+io.imshow(mean_image.astype(np.uint8))
+io.show()
+
+#f
+deviatie = np.std(images)
+print(deviatie)
+
+#g
+#print((images - mean_image)/deviatie)
+
+#h
+slice = images[:,200:300, 280:400] 
+io.imshow(slice[8].astype(np.uint8))
+io.show()

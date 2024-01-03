@@ -1,0 +1,54 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+#2
+train_images = np.loadtxt('train_images.txt') 
+train_labels = np.loadtxt('train_labels.txt').astype(int)
+
+test_images = np.loadtxt('test_images.txt') 
+test_labels = np.loadtxt('test_labels.txt').astype(int)
+
+bins = np.linspace(start=0, stop=255, num=5) 
+train_images_to_bins = np.digitize(train_images, bins) -1
+test_images_to_bins = np.digitize(test_images, bins) -1
+
+#3
+from sklearn.naive_bayes import MultinomialNB
+
+bins = np.linspace(start=0, stop=255, num=5) 
+train_images_to_bins = np.digitize(train_images, bins) -1
+test_images_to_bins = np.digitize(test_images, bins) -1
+
+naive_bayes_model = MultinomialNB();
+naive_bayes_model.fit(train_images_to_bins, train_labels)
+print(naive_bayes_model.score(test_images_to_bins, test_labels))
+
+#4
+for i in [3, 5, 7, 9, 11]:
+  bins = np.linspace(start=0, stop=255, num=i)
+  train_images_to_bins = np.digitize(train_images, bins) -1
+  test_images_to_bins = np.digitize(test_images, bins) -1
+
+  naive_bayes_model = MultinomialNB();
+  naive_bayes_model.fit(train_images_to_bins, train_labels)
+  print(naive_bayes_model.score(test_images_to_bins, test_labels))
+
+  #5
+predict = naive_bayes_model.predict(test_images)
+for i in range (len(predict)):
+  if predict[i] != test_labels[i]:
+    print(i)
+
+#6
+matrix = np.zeros((len(predict), len(predict)))
+def confusion_matrix(predicted, real):
+  num_labels = real.max()+1;
+  matrix = np.zeros((num_labels,num_labels))
+  for i in range (len(predict)):
+    matrix[predicted[i]][real[i]] += 1 
+  return matrix
+
+print(confusion_matrix(predict, test_labels))
+
+
+

@@ -1,0 +1,80 @@
+#1+2
+import numpy as np
+
+def calculam_l2(train_images, test_images):
+  dif = train_images - test_images
+  suma = np.sum(dif **2, axis=1)
+  return np.sqrt(suma)
+
+def calculam_l1(train_images, test_images):
+  dif = np.absolute(train_images - test_images)
+  return np.sum(dif, axis=1)
+
+class KnnClasifier:
+
+  def __init__(self, train_images, train_labels):
+    self.train_images = train_images
+    self.train_labels = train_labels
+
+  def classify_image(self, test_images, num_neighbors=3, metric='l2'):
+    if metric=='l2':
+      distances = calculam_l2(self.train_images, test_images)
+    else: 
+      distances = calculam_l1(self.train_images, test_images)
+
+    knn_indici = np.argsort(distances) [:num_neighbors]
+    rez = np.bincount(self.train_labels[knn_indici]) 
+    return np.argmax(rez)
+
+#3
+train_images = np.loadtxt('train_images.txt')
+test_images = np.loadtxt('test_images.txt')
+train_labels = np.loadtxt('train_labels.txt').astype(int)
+test_labels = np.loadtxt('test_labels.txt').astype(int)
+
+knn_classifier = KnnClasifier(train_images, train_labels)
+
+predictions = []
+for img in test_images:
+  prediction = knn_classifier.classify_image(img, num_neighbors=3, metric='l2')
+  predictions.append(prediction)
+
+predictions = np.array(predictions)
+np.savetxt('predictii_3nn_l2_mnist.txt', predictions)
+
+correct = 0
+for i in range(len(test_labels)):
+  if test_labels[i] == predictions[i]:
+    correct += 1
+  
+accuracy = correct/len(test_labels)*100
+print(accuracy)
+  
+#4
+import matplotlib.pyplot as plt
+
+accuracies=[]
+test_predictions=[]
+for i in [1,3,5,7,9]:
+  f = open(f"predictii_{i}nn_l2.txt","w")
+  for img in test_images:
+    test_prediction = knn_classifier.classify_image(img, num_neighbors=i, metric='l2')
+    test_predictions.append(test_prediction)
+
+  correct = 0
+  for i in range(len(test_labels)):
+    if test_labels[i] == test_predictions[i]:
+      correct += 1
+  
+  accuracy = correct/len(test_labels)*100
+  f.write(f"pentru testul {i} -> {accuracy}")
+  f.close()
+  accuracies.append(accuracy)
+
+plt.title('Accuracy depending on how many neighbors')
+plt.xlabel("K neighbors")
+plt.ylabel("Accuracy")
+plt.plot([1, 3, 5, 7, 9], accuracies)
+plt.show()
+
+
